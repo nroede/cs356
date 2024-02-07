@@ -88,8 +88,46 @@ int client(const char * addr, uint16_t port)
 
 int server(uint16_t port)
 {
-	/*
-		Add your code here
-	*/
+	//printf("test0\n");
+	struct sockaddr_in sin;
+	char buf[MAX_MSG_LENGTH];
+	int len;
+	int s, new_s;
+	/* build address data structure */
+	bzero((char *)&sin, sizeof(sin));
+	sin.sin_family = AF_INET;
+	sin.sin_addr.s_addr = INADDR_ANY;
+	sin.sin_port = htons(port);
+	//printf("test1\n");
+	/* setup passive open */
+	if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+		perror("Create socket error:");
+		exit(1);
+	}
+	//printf("test2\n");
+	if ((bind(s, (struct sockaddr *)&sin, sizeof(sin))) < 0) {
+		perror("Bind error:");
+		exit(1);
+	}
+	printf("bind done\n");
+	listen(s, MAX_BACK_LOG);
+	printf("listen done, waiting for connection\n");
+	/* wait for connection, then receive and print text */
+	while(1) {
+		if ((new_s = accept(s, (struct sockaddr *)&sin, &len)) < 0) {
+			perror("Recv error:");
+			exit(1);
+		}
+		while (len = recv(new_s, buf, sizeof(buf), 0)) {
+			printf("msg from client: %s", buf);
+			if ((send(new_s, buf, sizeof(buf), 0)) < 0) {
+				perror("Send error:");
+				exit(1);
+			}
+			bzero(buf, sizeof(buf));
+		}
+		close(new_s);
+		printf("client disconnected, waiting for connection\n");
+	}
 	return 0;
 }
