@@ -88,7 +88,6 @@ int client(const char * addr, uint16_t port)
 
 int server(uint16_t port)
 {
-	//printf("test0\n");
 	struct sockaddr_in sin;
 	char buf[MAX_MSG_LENGTH];
 	int len;
@@ -98,13 +97,11 @@ int server(uint16_t port)
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = INADDR_ANY;
 	sin.sin_port = htons(port);
-	//printf("test1\n");
 	/* setup passive open */
 	if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 		perror("Create socket error:");
 		exit(1);
 	}
-	//printf("test2\n");
 	if ((bind(s, (struct sockaddr *)&sin, sizeof(sin))) < 0) {
 		perror("Bind error:");
 		exit(1);
